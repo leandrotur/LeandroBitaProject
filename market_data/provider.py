@@ -1,4 +1,5 @@
-""" Data layer for querying market data from Bita's Galaxy database.
+"""
+AlphaVantage provider
 """
 from datetime import datetime
 

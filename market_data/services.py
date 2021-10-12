@@ -2,23 +2,31 @@ from market_data.provider import query_daily_data_for_instrument
 import pandas as pd
 import numpy as np
 
+"""
+Calc stats service
+"""
+
+
+def etl_market_data(data):
+    data = pd.DataFrame.from_dict(data['Time Series (Daily)'], orient='index').sort_index(axis=1)
+    data = data.rename(columns={'1. open': 'Open', '2. high': 'High', '3. low': 'Low', '4. close': 'Close',
+                                '5. adjusted close': 'AdjClose', '6. volume': 'Volume'})
+    data = data[['Open', 'High', 'Low', 'Close', 'AdjClose', 'Volume']]
+    data['AdjClose'] = pd.to_numeric(data['AdjClose'], errors='coerce')
+    return data
+
 
 def run_statistics(
         ticker: str, date: str
 ):
     """ Calculates statistics for an instrument
     """
-    # getdate
-    datajson = query_daily_data_for_instrument(ticker, date)
-    # ETL --> to refactor
-    data = pd.DataFrame.from_dict(datajson['Time Series (Daily)'], orient='index').sort_index(axis=1)
-    data = data.rename(columns={'1. open': 'Open', '2. high': 'High', '3. low': 'Low', '4. close': 'Close',
-                                '5. adjusted close': 'AdjClose', '6. volume': 'Volume'})
-    data = data[['Open', 'High', 'Low', 'Close', 'AdjClose', 'Volume']]
-    data['AdjClose'] = pd.to_numeric(data['AdjClose'], errors='coerce')
+    # get data from provider
+    data_json = query_daily_data_for_instrument(ticker, date)
+    # to dataframe
+    data = etl_market_data(data_json)
+    # filter by date
     data = data[:f'{date}']
-    # ETL end
-
     # get statistics
     annual_return = cagr(data, True)
     annual_vol = volatility(data, True)
@@ -27,16 +35,16 @@ def run_statistics(
     sharpe = sharpe_ratio(data, 0.03)
 
     last_price = data['AdjClose'][-1]
-
     # set message -- > to refactor
-    message = {
+    message = {'stock': {
         'ticker': ticker,
-        'last adjclose': last_price,
-        'return': ret,
-        'annual return': annual_return,
-        'annual volatility': annual_vol,
-        'volatility': vol,
-        'sharpe': sharpe
+        'last adjclose': last_price},
+        'Stats': {
+            'return': ret,
+            'annual return': annual_return,
+            'volatility': vol,
+            'annual volatility': annual_vol,
+            'sharpe ratio': sharpe}
     }
 
     return message
