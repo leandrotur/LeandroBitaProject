@@ -15,7 +15,7 @@ def query_daily_data_for_instrument(ticker: str, startdate: str):
     """
 
     # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
-    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey=demo'
+    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&outputsize=full&apikey=demo'
     r = requests.get(url)
     data = r.json()
     logger.debug(f"Executing query: {url}")
