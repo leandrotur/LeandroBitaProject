@@ -1,5 +1,5 @@
-# Marketdata stats APi
-An API to retrieve sotck stats
+# Marketdata stats API
+An API to retrieve stock stats
 route: /market_data/statistics
 input parameters: ticker
                   start_date
