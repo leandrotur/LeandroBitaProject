@@ -5,7 +5,7 @@ from loguru import logger
 from market_data.validations import validate_request
 
 """
-Get stats one only end point
+Get stats
 """
 
 
@@ -34,7 +34,6 @@ def runstats():
         validate_request(ticker, start_date)
         # calculate stats
         dict_obj = run_statistics(ticker, start_date)
-
         message['data'] = dict_obj
     except KeyError as e:
         logger.error(f"Error: {e}; {message['message']}")
@@ -49,17 +48,16 @@ def runstats():
         message['status'] = 400
 
     except (TypeError, AttributeError, ValueError) as e:
-
+        logger.error(f"Error: {e}; {message['message']}")
         message['message'] = str(e.args[0])
         message['error'] = True
         message['status'] = 400
-        logger.error(f"Error: {e}; {message['message']}")
-    except Exception as e:
 
+    except Exception as e:
+        logger.error(f"Error: {e}; {message['message']}")
         message['message'] = str(e.args[0])
         message['error'] = True
         message['status'] = 401
-        logger.error(f"Error: {e}; {message['message']}")
 
     resp = jsonify(message)
     resp.status_code = message['status']

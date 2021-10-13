@@ -1,4 +1,5 @@
 from market_data.provider import query_daily_data_for_instrument
+from settings import rf
 import pandas as pd
 import numpy as np
 
@@ -32,8 +33,8 @@ def run_statistics(
     annual_vol = volatility(data, True)
     ret = cagr(data, False)
     vol = volatility(data, False)
-    sharpe = sharpe_ratio(data, 0.03)
-
+    # sharpe = sharpe_ratio(data, 0.03)
+    sharpe = sharpe_ratio_v2(annual_return, annual_vol, rf)
     last_price = data['AdjClose'][-1]
     # set message -- > to refactor
     message = {'stock': {
@@ -77,4 +78,9 @@ def volatility(data, annual: bool):
 def sharpe_ratio(data, rf):
     df = data.copy()
     sharpe = (cagr(df, 1) - rf) / volatility(df, 1)
+    return sharpe
+
+
+def sharpe_ratio_v2(cagr, volatility, rf):
+    sharpe = (cagr - rf) / volatility
     return sharpe
